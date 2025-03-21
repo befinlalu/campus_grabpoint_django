@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser,Category,Product,Order, OrderItem
+from .models import CustomUser,Category,Product,Order, OrderItem,PrintOrder
  
 
 class CustomUserAdmin(UserAdmin):
@@ -64,6 +64,27 @@ class OrderAdmin(admin.ModelAdmin):
         queryset.update(status='cancelled')
     mark_as_cancelled.short_description = "Mark selected orders as cancelled"
 
+
+class PrintOrderAdmin(admin.ModelAdmin):
+    list_display = ["id", "user", "total_price", "status", "payment_status", "created_at"]
+    list_filter = ["status", "payment_status", "created_at"]
+    search_fields = ["user__username", "status", "payment_status"]
+
+    actions = ["mark_as_shipped", "mark_as_delivered", "mark_as_cancelled"]
+
+    def mark_as_shipped(self, request, queryset):
+        queryset.update(status="shipped")
+    mark_as_shipped.short_description = "Mark selected orders as shipped"
+
+    def mark_as_delivered(self, request, queryset):
+        queryset.update(status="delivered")
+    mark_as_delivered.short_description = "Mark selected orders as delivered"
+
+    def mark_as_cancelled(self, request, queryset):
+        queryset.update(status="cancelled")
+    mark_as_cancelled.short_description = "Mark selected orders as cancelled"
+
+admin.site.register(PrintOrder, PrintOrderAdmin)
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem)

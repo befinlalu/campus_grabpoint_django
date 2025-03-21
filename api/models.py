@@ -53,6 +53,17 @@ class Cart(models.Model):
         return f"Cart {self.id} - {self.user.username} - {self.product.name}"
 
 
+class OrderAddress(models.Model):
+    order = models.OneToOneField('Order', on_delete=models.CASCADE, related_name='order_address')
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    registration_no = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField()
+    note = models.TextField(blank=True, null=True)  # Optional field for extra notes
+
+    def __str__(self):
+        return f"Address for Order {self.order.id}"
 
 class Order(models.Model):
     PAYMENT_CHOICES = [
@@ -60,15 +71,18 @@ class Order(models.Model):
         ('card', 'Card Payment'),
         ('upi', 'UPI Payment'),
     ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('ready', 'Ready'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)  # Total order cost
     created_at = models.DateTimeField(auto_now_add=True)  # Order creation time
-    status = models.CharField(
-        max_length=20,
-        choices=[('pending', 'Pending'), ('shipped', 'Shipped'), ('delivered', 'Delivered'),('cancelled', 'Cancelled')],
-        default='pending'
-    )
-    payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cod') 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cod')
 
     def __str__(self):
         return f"Order {self.id} - {self.user.username} - {self.status}"
@@ -81,3 +95,55 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
+
+
+class PrintOrder(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='print_orders')
+    paper_size = models.CharField(max_length=10, choices=[("A4", "A4"), ("A3", "A3"), ("letter", "Letter")])
+    color_mode = models.CharField(max_length=12, choices=[("color", "Color"), ("black/white", "Black & White")])
+    print_sides = models.CharField(max_length=10, choices=[("single", "Single"), ("double", "Double")])
+    binding_option = models.CharField(max_length=10, choices=[("staples", "Staples"), ("spiral", "Spiral")])
+    urgency = models.CharField(max_length=10, choices=[("standard", "Standard"), ("express", "Express")])
+    additional_notes = models.TextField(blank=True, null=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[
+        ("pending", "Pending"), ("printed", "Printed"),
+        ("delivered", "Delivered"), ("cancelled", "Cancelled")
+    ], default="pending")
+    payment_status = models.CharField(max_length=20, choices=[("cod", "Cash on Delivery"), ("card", "Card Payment"), ("upi", "UPI Payment")], default="cod")
+
+    def __str__(self):
+        return f"Print Order {self.id} - {self.user.username}"
+
+class PrintOrderFile(models.Model):
+    print_order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE, related_name="files")
+    file = models.FileField(upload_to="print_orders/")  # Stores each file separately
+
+    def __str__(self):
+        return f"File for Order {self.print_order.id}"
+
+
+class Rating(models.Model):
+    RATING_CHOICES = [
+        (1, 'Not Useful'),
+        (2, 'Bad'),
+        (3, 'Poor'),
+        (4, 'Good'),
+        (5, 'Very Good')
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ratings')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='ratings')
+    rating = models.IntegerField(choices=RATING_CHOICES)  # Required rating field (1-5)
+    title = models.CharField(max_length=50, blank=True)  # Auto-filled based on rating
+    description = models.TextField(blank=True, null=True)  # Optional review
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp
+
+    def save(self, *args, **kwargs):
+        """Auto-assign title based on rating value."""
+        self.title = dict(self.RATING_CHOICES).get(self.rating, 'Unknown')
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.user.username} ({self.rating})"
