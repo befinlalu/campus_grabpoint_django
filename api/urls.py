@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import UserRegistrationView, CustomTokenObtainPairView, LogoutView, ProductListView, CartView,AddToCartView,CheckoutView,UserOrdersView,CategoryListView,PrintOrderCreateView,UserPrintOrderListView,CartDeleteView
-from .views import ProductDetailView,RatingCreateView,ProductRatingListView, ProductRatingSummaryView,UpdateCartQuantityView
+from .views import ProductDetailView,RatingCreateView,ProductRatingListView, ProductRatingSummaryView,UpdateCartQuantityView,ForgotPasswordAPIView
 
 urlpatterns = [
     path('auth/register/', UserRegistrationView.as_view(), name='register'),
@@ -18,6 +18,7 @@ urlpatterns = [
     path('cart/remove/<int:pk>/', CartDeleteView.as_view(), name='cart-remove'),
     path('ratings/add/', RatingCreateView.as_view(), name='add-rating'),
     path('products/<int:product_id>/ratings/', ProductRatingListView.as_view(), name='product-ratings'),
-     path('products/<int:product_id>/rating-summary/', ProductRatingSummaryView.as_view(), name='product-rating-summary'),
-      path('cart/update/<int:cart_id>/', UpdateCartQuantityView.as_view(), name='update-cart-quantity'),
+    path('products/<int:product_id>/rating-summary/', ProductRatingSummaryView.as_view(), name='product-rating-summary'),
+    path('cart/update/<int:cart_id>/', UpdateCartQuantityView.as_view(), name='update-cart-quantity'),
+    path("forgot-password/", ForgotPasswordAPIView.as_view(), name="forgot-password"),
 ]

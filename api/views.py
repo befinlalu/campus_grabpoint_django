@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserRegistrationSerializer,RatingSerializer, CustomTokenObtainPairSerializer,OrderSerializer,CategorySerializer,PrintOrderSerializer,OrderAddressSerializer
+from .serializers import UserRegistrationSerializer,RatingSerializer, CustomTokenObtainPairSerializer,OrderSerializer,CategorySerializer,PrintOrderSerializer,OrderAddressSerializer,ForgotPasswordSerializer
 from .models import Product, Cart,Order, OrderItem, Category,PrintOrder,PrintOrderFile,Rating,OrderAddress
 from .serializers import ProductSerializer, CartSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -13,7 +13,7 @@ from django.db.models import Avg, Count
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-
+from django.contrib.auth.hashers import make_password
 
 
 
@@ -31,6 +31,18 @@ class UserRegistrationView(generics.CreateAPIView):
             return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ForgotPasswordAPIView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            new_password = serializer.validated_data["new_password"]
+            user.password = make_password(new_password)
+            user.save()
+
+            return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Custom Token Obtain View (JWT Login)
 class CustomTokenObtainPairView(TokenObtainPairView):

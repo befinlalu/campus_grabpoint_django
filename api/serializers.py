@@ -30,6 +30,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
 
+class ForgotPasswordSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    new_password = serializers.CharField(write_only=True, min_length=6)
+
+    def validate(self, data):
+        username = data.get("username")
+        email = data.get("email")
+
+        # Check if user exists
+        user = User.objects.filter(username=username, email=email).first()
+        if not user:
+            raise serializers.ValidationError("User with given username and email does not exist.")
+        
+        data["user"] = user  # Store user for use in view
+        return data
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
