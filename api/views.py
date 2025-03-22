@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserRegistrationSerializer,RatingSerializer, CustomTokenObtainPairSerializer,OrderSerializer,CategorySerializer,PrintOrderSerializer,OrderAddressSerializer,ForgotPasswordSerializer
+from .serializers import UserRegistrationSerializer,RatingSerializer, CustomTokenObtainPairSerializer,OrderSerializer,CategorySerializer,PrintOrderSerializer,OrderAddressSerializer,ForgotPasswordSerializer,UserSerializer
 from .models import Product, Cart,Order, OrderItem, Category,PrintOrder,PrintOrderFile,Rating,OrderAddress
 from .serializers import ProductSerializer, CartSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -14,9 +14,10 @@ import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
 
 
-
+User = get_user_model()
 
 
 # User Registration View
@@ -30,6 +31,15 @@ class UserRegistrationView(generics.CreateAPIView):
             serializer.save()
             return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserDetailView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Require authentication
+
+    def get(self, request, *args, **kwargs):
+        user = request.user  # Get the logged-in user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
 
 class ForgotPasswordAPIView(APIView):
     def post(self, request):

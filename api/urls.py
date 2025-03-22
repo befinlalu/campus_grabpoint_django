@@ -1,11 +1,12 @@
 from django.urls import path
 from .views import UserRegistrationView, CustomTokenObtainPairView, LogoutView, ProductListView, CartView,AddToCartView,CheckoutView,UserOrdersView,CategoryListView,PrintOrderCreateView,UserPrintOrderListView,CartDeleteView
-from .views import ProductDetailView,RatingCreateView,ProductRatingListView, ProductRatingSummaryView,UpdateCartQuantityView,ForgotPasswordAPIView
+from .views import ProductDetailView,RatingCreateView,ProductRatingListView, ProductRatingSummaryView,UpdateCartQuantityView,ForgotPasswordAPIView,UserDetailView
 
 urlpatterns = [
     path('auth/register/', UserRegistrationView.as_view(), name='register'),
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path("user-details/", UserDetailView.as_view(), name="user-details"),
     path('products/', ProductListView.as_view(), name='product-list'),
     path('products/<int:id>/', ProductDetailView.as_view(), name='product-detail'),
     path('cart/', CartView.as_view(), name='cart'),  # Added cart endpoint
