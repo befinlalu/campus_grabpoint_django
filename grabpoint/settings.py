@@ -9,7 +9,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = 'django-insecure-uvwlx&5vs6_-mnwyq-rl)r*qol3n*2lck=35hc%91v*9i!n=rt'
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 # ✅ FIXED: Proper CORS Configuration
 INSTALLED_APPS = [
@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'grabpoint.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'grabpoint',
+        'NAME': 'nodes',
         'USER': 'postgres',
         'PASSWORD': '559261',
         'HOST': 'localhost',

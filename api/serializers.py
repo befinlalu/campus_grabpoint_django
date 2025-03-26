@@ -111,18 +111,21 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)  # Include order items
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     payment_status = serializers.ChoiceField(choices=Order.PAYMENT_CHOICES)  # Allow payment status update
+    transaction_id = serializers.CharField(required=False, allow_null=True, allow_blank=True)  # Fix here
     order_address = OrderAddressSerializer()  # Include address details in response
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'total_price', 'status', 'payment_status', 'created_at', 'items', 'order_address']
+        fields = ['id', 'user', 'total_price', 'status', 'payment_status', 'transaction_id', 'created_at', 'items', 'order_address']
         read_only_fields = ['user', 'total_price', 'status', 'created_at', 'items']
 
     def update(self, instance, validated_data):
-        """Allow updating payment_status only"""
+        """Allow updating payment_status and transaction_id"""
         instance.payment_status = validated_data.get('payment_status', instance.payment_status)
+        instance.transaction_id = validated_data.get('transaction_id', instance.transaction_id)
         instance.save()
         return instance
+
 
 
 
@@ -145,9 +148,11 @@ class PrintOrderSerializer(serializers.ModelSerializer):
         fields = [
             "id", "files", "paper_size", "color_mode", "print_sides",
             "binding_option", "urgency", "additional_notes",
-            "total_price", "created_at", "status", "payment_status"
+            "total_price", "created_at", "status", "payment_status",
+            "transaction_id"  # Added transaction_id
         ]
         read_only_fields = ["id", "created_at", "status"]
+
 
 
 

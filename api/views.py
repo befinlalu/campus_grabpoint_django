@@ -120,6 +120,7 @@ class CheckoutView(APIView):
 
         # Get payment status and address details
         payment_status = request.data.get("payment_status")
+        transaction_id = request.data.get("transaction_id")
         address_data = request.data.get("order_address")
 
         # Validate payment status
@@ -138,7 +139,7 @@ class CheckoutView(APIView):
         total_price = sum(item.total_price for item in cart_items)
 
         # Create the order
-        order = Order.objects.create(user=request.user, total_price=total_price, payment_status=payment_status)
+        order = Order.objects.create(user=request.user, total_price=total_price, payment_status=payment_status,transaction_id=transaction_id if transaction_id else None)
 
         # Create the order address
         OrderAddress.objects.create(order=order, **address_data)
@@ -201,11 +202,13 @@ class PrintOrderCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        print_order = serializer.save(user=self.request.user)  # Assign user
-        files = self.request.FILES.getlist('files')  # Get multiple files
+        transaction_id = self.request.data.get("transaction_id", None)  # Get transaction_id (can be None)
+        print_order = serializer.save(user=self.request.user, transaction_id=transaction_id)  # Assign user & transaction_id
 
+        files = self.request.FILES.getlist('files')  # Get multiple files
         for file in files:
             PrintOrderFile.objects.create(print_order=print_order, file=file)
+
 
 from rest_framework import generics, permissions
 from .models import PrintOrder
