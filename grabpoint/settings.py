@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'grabpoint.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nodes',
+        'NAME': 'campus',
         'USER': 'postgres',
         'PASSWORD': '559261',
         'HOST': 'localhost',

@@ -5,7 +5,11 @@ from django.contrib.auth import get_user_model
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(unique=True)  # Ensure email is unique
+    username = models.CharField(
+        max_length=150,  # Keep it 150 or adjust as needed
+        unique=True,  # Ensure usernames remain unique
+    )
+    email = models.EmailField(unique=True)  
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     is_verified = models.BooleanField(default=False) 
