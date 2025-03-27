@@ -107,7 +107,7 @@ class PrintOrder(models.Model):
     paper_size = models.CharField(max_length=10, choices=[("A4", "A4"), ("A3", "A3"), ("letter", "Letter")])
     color_mode = models.CharField(max_length=12, choices=[("color", "Color"), ("black/white", "Black & White")])
     print_sides = models.CharField(max_length=10, choices=[("single", "Single"), ("double", "Double")])
-    binding_option = models.CharField(max_length=10, choices=[("staples", "Staples"), ("spiral", "Spiral")])
+    binding_option = models.CharField(max_length=10, choices=[("none", "None"),("staples", "Staples"), ("spiral", "Spiral")])
     urgency = models.CharField(max_length=10, choices=[("standard", "Standard"), ("express", "Express")])
     additional_notes = models.TextField(blank=True, null=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
