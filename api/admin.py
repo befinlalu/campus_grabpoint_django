@@ -50,7 +50,7 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'status', 'payment_status']
     inlines = [OrderItemInline]
 
-    actions = ['mark_as_shipped', 'mark_as_delivered', 'mark_as_cancelled']
+    actions = ['mark_as_confirmed','mark_as_ready', 'mark_as_delivered', 'mark_as_cancelled']
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -66,11 +66,17 @@ class OrderAdmin(admin.ModelAdmin):
 
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
 
-    def mark_as_shipped(self, request, queryset):
-        queryset.update(status='shipped')
+    def mark_as_confirmed(self, request, queryset):
+        queryset.update(status='confirmed')
         for order in queryset:
             self.send_status_email(order)
-    mark_as_shipped.short_description = "Mark selected orders as shipped"
+    mark_as_confirmed.short_description = "Mark selected orders as confirmed"
+
+    def mark_as_ready(self, request, queryset):
+        queryset.update(status='ready')
+        for order in queryset:
+            self.send_status_email(order)
+    mark_as_ready.short_description = "Mark selected orders as ready"
 
     def mark_as_delivered(self, request, queryset):
         queryset.update(status='delivered')
