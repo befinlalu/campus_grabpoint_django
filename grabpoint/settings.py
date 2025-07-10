@@ -106,5 +106,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'jorgeklalu@gmail.com'
-EMAIL_HOST_PASSWORD = 'npht pwhj usnz swdp'  # Use the generated app password
+EMAIL_HOST_PASSWORD = '**** **** ****'  # Use the generated app password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
